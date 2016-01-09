@@ -180,11 +180,10 @@ angular.module('ngS3upload.directives').
             var bucket = scope.$eval(attrs.bucket);
 
             // Bind the button click event
-            var button = angular.element(element.children()[1]),
-              file = angular.element(element.find("input")[0]);
-            button.bind('click', function (e) {
+            var file = angular.element(element.find("input")[0]);
+            scope.uploadClick = function(){
               file[0].click();
-            });
+            };
             //adding accept from passed options to make sure only allowed files are shown in file selector
             scope.accept = opts.accept;
             scope.wrongFormatError = null;
@@ -299,7 +298,10 @@ angular.module('ngS3upload').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('theme/bootstrap2.html',
     "<div class=\"upload-wrap\">\n" +
-    "  <button class=\"btn btn-primary\" type=\"button\">\n" +
+    "  <div ng-hide=\"wrongFormatError==null\">\n" +
+    "    <div class=\"alert alert-danger\">{{wrongFormatError}}</div>\n" +
+    "  </div>\n" +
+    "  <button class=\"btn btn-primary\" ng-click=\"uploadClick()\" type=\"button\">\n" +
     "    <span ng-if=\"!filename\">Choose file</span>\n" +
     "    <span ng-if=\"filename\">Replace file</span>\n" +
     "  </button>\n" +
@@ -307,14 +309,17 @@ angular.module('ngS3upload').run(['$templateCache', function($templateCache) {
     "  <div class=\"progress progress-striped\" ng-class=\"{active: uploading}\" ng-show=\"attempt\" style=\"margin-top: 10px;\">\n" +
     "    <div class=\"bar\" ng-class=\"{'bar-success': isUploadSuccessful()}\" style=\"width: {{ progress }}%;\"></div>\n" +
     "  </div>\n" +
-    "  <input type=\"file\" class=\"hidden\"/>\n" +
+    "  <input type=\"file\" class=\"hidden\" accept=\"{{accept}}\"/>\n" +
     "</div>\n"
   );
 
 
   $templateCache.put('theme/bootstrap3.html',
     "<div class=\"upload-wrap\">\n" +
-    "  <button class=\"btn btn-primary\" type=\"button\">\n" +
+    "  <div ng-hide=\"wrongFormatError==null\">\n" +
+    "    <div class=\"alert alert-danger\">{{wrongFormatError}}</div>\n" +
+    "  </div>\n" +
+    "  <button class=\"btn btn-primary\" ng-click=\"uploadClick()\" type=\"button\">\n" +
     "    <span ng-if=\"!filename\">Choose file</span>\n" +
     "    <span ng-if=\"filename\">Replace file</span>\n" +
     "  </button>\n" +
@@ -324,7 +329,7 @@ angular.module('ngS3upload').run(['$templateCache', function($templateCache) {
     "      <span class=\"sr-only\">{{progress}}% Complete</span>\n" +
     "    </div>\n" +
     "  </div>\n" +
-    "  <input type=\"file\" class=\"hidden\"/>\n" +
+    "  <input type=\"file\" class=\"hidden\" accept=\"{{accept}}\"/>\n" +
     "</div>\n"
   );
 

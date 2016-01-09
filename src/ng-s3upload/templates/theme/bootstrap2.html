@@ -1,5 +1,8 @@
 <div class="upload-wrap">
-  <button class="btn btn-primary" type="button">
+  <div ng-hide="wrongFormatError==null">
+    <div class="alert alert-danger">{{wrongFormatError}}</div>
+  </div>
+  <button class="btn btn-primary" ng-click="uploadClick()" type="button">
     <span ng-if="!filename">Choose file</span>
     <span ng-if="filename">Replace file</span>
   </button>
@@ -7,5 +10,5 @@
   <div class="progress progress-striped" ng-class="{active: uploading}" ng-show="attempt" style="margin-top: 10px;">
     <div class="bar" ng-class="{'bar-success': isUploadSuccessful()}" style="width: {{ progress }}%;"></div>
   </div>
-  <input type="file" class="hidden"/>
+  <input type="file" class="hidden" accept="{{accept}}"/>
 </div>

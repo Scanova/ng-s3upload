@@ -39,11 +39,10 @@ angular.module('ngS3upload.directives').
             var bucket = scope.$eval(attrs.bucket);
 
             // Bind the button click event
-            var button = angular.element(element.children()[1]),
-              file = angular.element(element.find("input")[0]);
-            button.bind('click', function (e) {
+            var file = angular.element(element.find("input")[0]);
+            scope.uploadClick = function(){
               file[0].click();
-            });
+            };
             //adding accept from passed options to make sure only allowed files are shown in file selector
             scope.accept = opts.accept;
             scope.wrongFormatError = null;
