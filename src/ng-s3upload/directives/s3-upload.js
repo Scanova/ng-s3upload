@@ -34,7 +34,7 @@ angular.module('ngS3upload.directives').
               folder: '',
               enableValidation: true,
               targetFilename: null,
-              accept:'*'
+              accept:''
             }, ngS3UploadConfig, opts);
             var bucket = scope.$eval(attrs.bucket);
 
