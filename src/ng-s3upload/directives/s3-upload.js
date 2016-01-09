@@ -33,26 +33,53 @@ angular.module('ngS3upload.directives').
               uploadingKey: 'uploading',
               folder: '',
               enableValidation: true,
-              targetFilename: null
+              targetFilename: null,
+              accept:'*'
             }, ngS3UploadConfig, opts);
             var bucket = scope.$eval(attrs.bucket);
 
             // Bind the button click event
-            var button = angular.element(element.children()[0]),
+            var button = angular.element(element.children()[1]),
               file = angular.element(element.find("input")[0]);
             button.bind('click', function (e) {
               file[0].click();
             });
+            //adding accept from passed options to make sure only allowed files are shown in file selector
+            scope.accept = opts.accept;
+            scope.wrongFormatError = null;
 
             // Update the scope with the view value
             ngModel.$render = function () {
               scope.filename = ngModel.$viewValue;
             };
 
+            function constructFileTypeErrorMessage(allowedTypes){
+              var message = "Please upload a ";
+              for (var i = 0; i < allowedTypes.length; i++) {
+                  if (i === allowedTypes.length - 1) {
+                      //last one
+                      message += "or " + allowedTypes[i].toUpperCase() + " file";
+                  } else {
+                      message += allowedTypes[i].toUpperCase() + ", ";
+                  }
+              }
+              return message;
+            }
+
             var uploadFile = function () {
               var selectedFile = file[0].files[0];
               var filename = selectedFile.name;
               var ext = filename.split('.').pop();
+
+              //if someone still uploads a file not allowed, handle the error here
+              scope.wrongFormatError = null;
+              if (opts.allowedTypes) {
+                var fileType = ext.toLowerCase();
+                if (opts.allowedTypes.indexOf(fileType) === -1 || filename.indexOf('.') === -1) {
+                  scope.wrongFormatError = constructFileTypeErrorMessage(opts.allowedTypes);
+                  return;
+                }
+              }
 
               if(angular.isObject(opts.getManualOptions)) {
                 _upload(opts.getManualOptions);
