@@ -57,7 +57,7 @@ angular.module('ngS3upload.directives').
               for (var i = 0; i < allowedTypes.length; i++) {
                   if (i === allowedTypes.length - 1) {
                       //last one
-                      message += "or " + allowedTypes[i].toUpperCase() + " file";
+                      message += (allowedTypes.length === 1 ? "" : "or ") + allowedTypes[i].toUpperCase() + " file";
                   } else {
                       message += allowedTypes[i].toUpperCase() + ", ";
                   }
@@ -72,7 +72,7 @@ angular.module('ngS3upload.directives').
 
               //if someone still uploads a file not allowed, handle the error here
               scope.wrongFormatError = null;
-              if (opts.allowedTypes) {
+              if (opts.allowedTypes && opts.allowedTypes.length > 0) {
                 var fileType = ext.toLowerCase();
                 if (opts.allowedTypes.indexOf(fileType) === -1 || filename.indexOf('.') === -1) {
                   scope.wrongFormatError = constructFileTypeErrorMessage(opts.allowedTypes);
