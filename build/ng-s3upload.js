@@ -140,6 +140,15 @@ angular.module('ngS3upload.services').
     };
   }]);
 angular.module('ngS3upload.directives').
+provider('s3UploadConfig', function(){
+  this.setBaseURI = function(baseURI){
+    this.baseURI = baseURI;
+  };
+  this.$get = function(){
+    return this;
+  };
+});
+angular.module('ngS3upload.directives').
   directive('s3Upload', ['$parse', 'S3Uploader', 'ngS3Config', 'ngS3UploadConfig', function ($parse, S3Uploader, ngS3Config, ngS3UploadConfig) {
     return {
       restrict: 'AC',
@@ -184,13 +193,14 @@ angular.module('ngS3upload.directives').
             scope.uploadClick = function(){
               file[0].click();
             };
+            scope.fileName = null;
             //adding accept from passed options to make sure only allowed files are shown in file selector
             scope.accept = opts.accept;
             scope.wrongFormatError = null;
 
             // Update the scope with the view value
             ngModel.$render = function () {
-              scope.filename = ngModel.$viewValue;
+              scope.fileURL = ngModel.$viewValue;
             };
 
             function constructFileTypeErrorMessage(allowedTypes){
@@ -208,7 +218,7 @@ angular.module('ngS3upload.directives').
 
             var uploadFile = function () {
               var selectedFile = file[0].files[0];
-              var filename = selectedFile.name;
+              var filename = scope.fileName = selectedFile.name;
               var ext = filename.split('.').pop();
 
               //if someone still uploads a file not allowed, handle the error here
@@ -236,7 +246,7 @@ angular.module('ngS3upload.directives').
                   ngModel.$setValidity('uploading', false);
                 }
 
-                var s3Uri = 'https://' + bucket + '.s3.amazonaws.com/';
+                var s3Uri = s3UploadConfig.baseURI ?  s3UploadConfig.baseURI : 'https://' + bucket + '.s3.amazonaws.com/';
                 var key = opts.targetFilename ? scope.$eval(opts.targetFilename) : opts.folder + (new Date()).getTime() + '-' + S3Uploader.randomString(16) + "." + ext;
                 S3Uploader.upload(scope,
                     s3Uri,
@@ -249,14 +259,14 @@ angular.module('ngS3upload.directives').
                     selectedFile
                   ).then(function () {
                     ngModel.$setViewValue(s3Uri + key);
-                    scope.filename = ngModel.$viewValue;
+                    scope.fileURL = ngModel.$viewValue;
 
                     if (opts.enableValidation) {
                       ngModel.$setValidity('uploading', true);
                       ngModel.$setValidity('succeeded', true);
                     }
                   }, function () {
-                    scope.filename = ngModel.$viewValue;
+                    scope.fileURL = ngModel.$viewValue;
 
                     if (opts.enableValidation) {
                       ngModel.$setValidity('uploading', true);
