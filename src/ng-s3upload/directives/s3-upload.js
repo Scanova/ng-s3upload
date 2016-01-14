@@ -1,20 +1,23 @@
 angular.module('ngS3upload.directives').
 provider('s3UploadConfig', function(){
-  this.setBaseURI = function(baseURI){
-    this.baseURI = baseURI;
+  this.setTestMode = function(opts){
+    this.testmode = true;
+    this.uploadURI = opts.uploadURI;
   };
   this.$get = function(){
     return this;
   };
 });
 angular.module('ngS3upload.directives').
-  directive('s3Upload', ['$parse', 'S3Uploader', 'ngS3Config', 'ngS3UploadConfig', function ($parse, S3Uploader, ngS3Config, ngS3UploadConfig) {
+  directive('s3Upload', ['$parse', 'S3Uploader', 'ngS3Config', 'ngS3UploadConfig', 's3UploadConfig', function ($parse, S3Uploader, ngS3Config, ngS3UploadConfig, s3UploadConfig) {
     return {
       restrict: 'AC',
       require: '?ngModel',
       replace: true,
       transclude: false,
-      scope: true,
+      scope: {
+        fileName:'='
+      },
       controller: ['$scope', '$element', '$attrs', '$transclude', function ($scope, $element, $attrs, $transclude) {
         $scope.attempt = false;
         $scope.success = false;
@@ -52,7 +55,6 @@ angular.module('ngS3upload.directives').
             scope.uploadClick = function(){
               file[0].click();
             };
-            scope.fileName = null;
             //adding accept from passed options to make sure only allowed files are shown in file selector
             scope.accept = opts.accept;
             scope.wrongFormatError = null;
@@ -105,7 +107,7 @@ angular.module('ngS3upload.directives').
                   ngModel.$setValidity('uploading', false);
                 }
 
-                var s3Uri = s3UploadConfig.baseURI ?  s3UploadConfig.baseURI : 'https://' + bucket + '.s3.amazonaws.com/';
+                var s3Uri = s3UploadConfig.testmode ?  s3UploadConfig.uploadURI : 'https://' + bucket + '.s3.amazonaws.com/';
                 var key = opts.targetFilename ? scope.$eval(opts.targetFilename) : opts.folder + (new Date()).getTime() + '-' + S3Uploader.randomString(16) + "." + ext;
                 S3Uploader.upload(scope,
                     s3Uri,
@@ -115,9 +117,11 @@ angular.module('ngS3upload.directives').
                     s3Options.key,
                     s3Options.policy,
                     s3Options.signature,
-                    selectedFile
-                  ).then(function () {
-                    ngModel.$setViewValue(s3Uri + key);
+                    selectedFile,
+                    s3UploadConfig.testmode
+                  ).then(function (xhr) {
+                    var value = s3UploadConfig.testmode ? xhr.responseText : s3Uri + key;
+                    ngModel.$setViewValue(value);
                     scope.fileURL = ngModel.$viewValue;
 
                     if (opts.enableValidation) {
