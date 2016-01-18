@@ -282,9 +282,13 @@ angular.module('ngS3upload.directives').
 
             element.bind('change', function (nVal) {
               if (opts.submitOnChange) {
-                scope.$apply(function () {
-                  uploadFile();
-                });
+                    if (!scope.$$phase) {
+                        scope.$apply(function() {
+                          uploadFile();
+                        });
+                    } else {
+                        uploadFile();
+                    }
               }
             });
 
