@@ -142,7 +142,9 @@ angular.module('ngS3upload.directives').
             element.bind('change', function (nVal) {
               if (opts.submitOnChange) {
                 $timeout(function() {
-                  uploadFile();
+                    scope.$apply(function() {
+                      uploadFile();
+                    });                  
                 });
               }
             });
