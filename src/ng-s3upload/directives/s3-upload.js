@@ -9,7 +9,7 @@ provider('s3UploadConfig', function(){
   };
 });
 angular.module('ngS3upload.directives').
-  directive('s3Upload', ['$parse', 'S3Uploader', 'ngS3Config', 'ngS3UploadConfig', 's3UploadConfig', function ($parse, S3Uploader, ngS3Config, ngS3UploadConfig, s3UploadConfig) {
+  directive('s3Upload', ['$parse', 'S3Uploader', 'ngS3Config', 'ngS3UploadConfig', 's3UploadConfig', '$timeout', function ($parse, S3Uploader, ngS3Config, ngS3UploadConfig, s3UploadConfig, $timeout) {
     return {
       restrict: 'AC',
       require: '?ngModel',
@@ -141,13 +141,9 @@ angular.module('ngS3upload.directives').
 
             element.bind('change', function (nVal) {
               if (opts.submitOnChange) {
-                    if (!scope.$$phase) {
-                        scope.$apply(function() {
-                          uploadFile();
-                        });
-                    } else {
-                        uploadFile();
-                    }
+                $timeout(function() {
+                  uploadFile();
+                });
               }
             });
 
