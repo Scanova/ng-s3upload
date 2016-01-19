@@ -17,7 +17,8 @@ angular.module('ngS3upload',
     ]);
 angular.module('ngS3upload.config').
   constant('ngS3Config', {
-    theme: 'bootstrap2'
+    theme: 'bootstrap2',
+    imgFormats: ['jpg', 'jpeg', 'png', 'gif','apng', 'svg', 'bmp', 'ico', 'bmp', 'dib']
   }).
   value('ngS3UploadConfig', {}).
   config(['$compileProvider', function($compileProvider){
@@ -199,10 +200,12 @@ angular.module('ngS3upload.directives').
             //adding accept from passed options to make sure only allowed files are shown in file selector
             scope.accept = opts.accept;
             scope.wrongFormatError = null;
+            scope.isImg = false;
 
             // Update the scope with the view value
             ngModel.$render = function () {
               scope.fileURL = ngModel.$viewValue;
+              scope.isImg = setImagType(scope.fileURL, ngS3Config.imgFormats);
             };
 
             function constructFileTypeErrorMessage(allowedTypes){
@@ -216,6 +219,16 @@ angular.module('ngS3upload.directives').
                   }
               }
               return message;
+            }
+
+            function setImagType(fileURL, imgFormats){
+              if(fileURL){
+                  var ext = fileURL.split('.').pop();
+                  return (imgFormats.indexOf(ext) !== -1);
+              }
+              else{
+                return false;
+              }
             }
 
             var uploadFile = function () {
@@ -232,6 +245,8 @@ angular.module('ngS3upload.directives').
                   return;
                 }
               }
+              //set the isImg var
+              scope.isImg = setImagType(filename, ngS3Config.imgFormats);
 
               if(angular.isObject(opts.getManualOptions)) {
                 _upload(opts.getManualOptions);

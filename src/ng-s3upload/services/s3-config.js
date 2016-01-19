@@ -1,6 +1,7 @@
 angular.module('ngS3upload.config').
   constant('ngS3Config', {
-    theme: 'bootstrap2'
+    theme: 'bootstrap2',
+    imgFormats: ['jpg', 'jpeg', 'png', 'gif','apng', 'svg', 'bmp', 'ico', 'bmp', 'dib']
   }).
   value('ngS3UploadConfig', {}).
   config(['$compileProvider', function($compileProvider){
