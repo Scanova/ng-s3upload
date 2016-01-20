@@ -63,7 +63,7 @@ angular.module('ngS3upload.directives').
             // Update the scope with the view value
             ngModel.$render = function () {
               scope.fileURL = ngModel.$viewValue;
-              scope.isImg = setImagType(scope.fileURL, ngS3Config.imgFormats);
+              scope.isImg = setImageType(scope.fileURL, ngS3Config.imgFormats);
             };
 
             function constructFileTypeErrorMessage(allowedTypes){
@@ -79,10 +79,10 @@ angular.module('ngS3upload.directives').
               return message;
             }
 
-            function setImagType(fileURL, imgFormats){
+            function setImageType(fileURL, imgFormats){
               if(fileURL){
                   var ext = fileURL.split('.').pop();
-                  return (imgFormats.indexOf(ext) !== -1);
+                  return (imgFormats.indexOf(ext.toLowerCase()) !== -1);
               }
               else{
                 return false;
@@ -104,7 +104,7 @@ angular.module('ngS3upload.directives').
                 }
               }
               //set the isImg var
-              scope.isImg = setImagType(filename, ngS3Config.imgFormats);
+              scope.isImg = setImageType(filename, ngS3Config.imgFormats);
 
               if(angular.isObject(opts.getManualOptions)) {
                 _upload(opts.getManualOptions);
